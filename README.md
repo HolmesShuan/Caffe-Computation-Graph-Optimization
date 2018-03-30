@@ -18,7 +18,7 @@
 
 **`*`**: We won't discuss layer reconstruction, such as conv-bn-relu layer. In this repository, one may accelerate models without writing a single line of code.   
 **`**`**: First convolution layer must hold **`pad==0`**, or the fusion of mean value subtraction may lead to performance loss. But scale factor fusion, is free to be utlized without those constraints. Taking 2-D input matrix as an example, 
-```
+```matlab
 % Matlab 
 >> mean = 122;
 >> X = mean*ones(3);
@@ -54,7 +54,7 @@ In fact, it is a problem inherent in Caffe. As annotation said:
 There are some redundant backup memorys at inference time. To further reduce the memory footprint, we need to define a novel memory allocation mechanism, which will be discussed in the future.   
 In this case, we use in-place optimization to simplify data dependecy, then we can merge BN and Scale easily. 
 ### How to use ?
-```
+```shell
 pip install configparser --user
 pip install numpy --user
 # install Caffe
