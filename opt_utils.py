@@ -128,6 +128,8 @@ def Inpt_OPT_New_Bias(original_prototxt_path, original_model_path, optimized_pro
     new_bias = np.mean(mean_data,1) 
     print "INPUT PREPROCESS (SUB MEAN) OPT : Calc New Bias Done."
 
+    del net
+
     caffe.set_mode_cpu()
     net = caffe.Net(original_prototxt_path, str(original_model_path), caffe.TEST)
     if len(net.params[target_layer_name]) == 2:
@@ -160,10 +162,13 @@ def Inpt_OPT_New_Bias(original_prototxt_path, original_model_path, optimized_pro
         with open(optimized_prototxt_path, 'wt') as f:
             f.write(MessageToString(net_param))
 
+        net_param_dict = net.params
+        del net
+
         new_net = caffe.Net(optimized_prototxt_path, caffe.TEST)
-        for param_name in net.params.keys():
-            for i in range(0,len(net.params[param_name])):
-                new_net.params[param_name][i].data[...] = net.params[param_name][i].data[...]
+        for param_name in net_param_dict.keys():
+            for i in range(0,len(net_param_dict[param_name])):
+                new_net.params[param_name][i].data[...] = net_param_dict[param_name][i].data[...]
         new_net.params[target_layer_name][1].data[...] = new_bias[...]
         new_net.save(new_model_path)
         print "INPUT PREPROCESS (SUB MEAN) OPT : Merge Mean Done."
@@ -239,7 +244,6 @@ def AFFine_OPT_Create_Caffemodel(original_prototxt_path, original_model_path, op
     net_param = caffe_pb2.NetParameter()
     with open(original_prototxt_path, 'rt') as f:
         Parse(f.read(), net_param)
-
     param_layer_type_list = [layer.type for layer in net_param.layer]
     param_layer_name_list = [layer.name for layer in net_param.layer]
     target_layer_type = ['Convolution', 'InnerProduct']
@@ -247,19 +251,21 @@ def AFFine_OPT_Create_Caffemodel(original_prototxt_path, original_model_path, op
 
     caffe.set_mode_cpu()
     net = caffe.Net(original_prototxt_path, original_model_path, caffe.TEST)
+    net_param_dict = net.params
+    del net
     new_net = caffe.Net(optimized_prototxt_path, caffe.TEST)
     for param_name in new_net.params.keys():
         param_layer_idx = param_layer_name_list.index(param_name)
         param_layer_type = param_layer_type_list[param_layer_idx]
         if param_layer_type not in target_layer_type:
             # OTHER LAYERS
-            for i in range(0,len(net.params[param_name])):
-                new_net.params[param_name][i].data[...] = net.params[param_name][i].data[...]
+            for i in range(0,len(net_param_dict[param_name])):
+                new_net.params[param_name][i].data[...] = net_param_dict[param_name][i].data[...]
         else:
-            kernel_num = net.params[param_name][0].num
-            new_net.params[param_name][0].data[...] = net.params[param_name][0].data[...]
-            if len(net.params[param_name]) == 2:
-                new_net.params[param_name][1].data[...] = net.params[param_name][1].data[...]
+            kernel_num = net_param_dict[param_name][0].num
+            new_net.params[param_name][0].data[...] = net_param_dict[param_name][0].data[...]
+            if len(net_param_dict[param_name]) == 2:
+                new_net.params[param_name][1].data[...] = net_param_dict[param_name][1].data[...]
             #else:
             #    print new_net.params[param_name][1].data[...]
             if param_layer_idx+1 < len(param_layer_type_list):
@@ -273,29 +279,30 @@ def AFFine_OPT_Create_Caffemodel(original_prototxt_path, original_model_path, op
                             if len(net_param.layer[i].bottom)>=2:
                                 # NOT In-place Scale
                                 try:
-                                    for j in range(0,len(net.params[affine_layer_name])):
-                                        new_net.params[affine_layer_name][j].data[...] = net.params[affine_layer_name][j].data[...]
+                                    for j in range(0,len(net_param_dict[affine_layer_name])):
+                                        new_net.params[affine_layer_name][j].data[...] = net_param_dict[affine_layer_name][j].data[...]
                                 except:
                                     # no parameter
                                     break
                             else:
                                 # In-place Scale
-                                scale = net.params[affine_layer_name][0].data
-                                if len(net.params[affine_layer_name]) == 2:
-                                    bias = net.params[affine_layer_name][1].data
+                                scale = net_param_dict[affine_layer_name][0].data
+                                if len(net_param_dict[affine_layer_name]) == 2:
+                                    bias = net_param_dict[affine_layer_name][1].data
                                 else:
                                     bias = 0.0*scale
                                 for k in range(0, kernel_num):
                                     new_net.params[param_name][0].data[k] = new_net.params[param_name][0].data[k]*scale[k]
                                     new_net.params[param_name][1].data[k] = new_net.params[param_name][1].data[k]*scale[k]+bias[k]
                         elif affine_layer_type == "BatchNorm":
-                            scale = net.params[affine_layer_name][2].data[0]
+                            scale = net_param_dict[affine_layer_name][2].data[0]
+                            # print scale
                             if scale != 0:
-                                mean = net.params[affine_layer_name][0].data / scale
-                                std = np.sqrt(net.params[affine_layer_name][1].data / scale)
+                                mean = net_param_dict[affine_layer_name][0].data / scale
+                                std = np.sqrt(abs(net_param_dict[affine_layer_name][1].data) / scale)
                             else:
-                                mean = net.params[affine_layer_name][0].data
-                                std = np.sqrt(net.params[affine_layer_name][1].data)
+                                mean = net_param_dict[affine_layer_name][0].data
+                                std = np.sqrt(abs(net_param_dict[affine_layer_name][1].data))
                             for k in range(0, kernel_num):
                                 new_net.params[param_name][0].data[k] = new_net.params[param_name][0].data[k] / std[k]
                                 new_net.params[param_name][1].data[k] = (new_net.params[param_name][1].data[k] - mean[k]) / std[k]
