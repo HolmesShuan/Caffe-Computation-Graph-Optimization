@@ -42,7 +42,7 @@ Optimization | Netscope | CPU forward (ms) | GPU forward (ms) | GPU Memory (MB)
 ------------ | ------------- | ------------- | -------------- | ---------
 Naive | [view](http://ethereon.github.io/netscope/#/gist/46e9a5a337b67f4e7cfcd1b04137a8a9) | 26.20 | 2.766 | 168
 In-place | [view](http://ethereon.github.io/netscope/#/gist/c964c5e940ac21c5a8cc67257b345d7f) | 26.29 | 2.734 | 165
-Fusion | [view](http://ethereon.github.io/netscope/#/gist/409198ed27b1f26595f329aa5e550016) | 23.16 | 2.070 | 160
+Fusion | [view](http://ethereon.github.io/netscope/#/gist/409198ed27b1f26595f329aa5e550016) | **23.16** | **2.070** | **160**
 
 *CPU : Intel® Xeon(R) CPU E3-1220 v5 @ 3.00GHz × 4 + OpenBLAS*   
 *GPU : K80 + CUDA8.0 + cuDNN*   
@@ -60,6 +60,7 @@ GPU forward (ms) | [AlexNet-BN](https://github.com/HolmesShuan/AlexNet-BN-Caffem
 ------- | --------------- | ------------------ | --------------------
 Naive | 6.981 | 13.769 | 14.550
 OPT   | 5.347 | 8.865 | 7.167
+Acceleration | **1.31x** | **1.55x** | **2.03x**
 
 *mean time of 1K iterations with batchsize=1*
 ### How to use ?
