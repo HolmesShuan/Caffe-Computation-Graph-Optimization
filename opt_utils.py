@@ -295,14 +295,15 @@ def AFFine_OPT_Create_Caffemodel(original_prototxt_path, original_model_path, op
                                     new_net.params[param_name][0].data[k] = new_net.params[param_name][0].data[k]*scale[k]
                                     new_net.params[param_name][1].data[k] = new_net.params[param_name][1].data[k]*scale[k]+bias[k]
                         elif affine_layer_type == "BatchNorm":
+                            epsilon = 1e-5
                             scale = net_param_dict[affine_layer_name][2].data[0]
                             # print scale
                             if scale != 0:
                                 mean = net_param_dict[affine_layer_name][0].data / scale
-                                std = np.sqrt(abs(net_param_dict[affine_layer_name][1].data) / scale)
+                                std = np.sqrt(net_param_dict[affine_layer_name][1].data/scale + epsilon)
                             else:
                                 mean = net_param_dict[affine_layer_name][0].data
-                                std = np.sqrt(abs(net_param_dict[affine_layer_name][1].data))
+                                std = np.sqrt(net_param_dict[affine_layer_name][1].data + epsilon)
                             for k in range(0, kernel_num):
                                 new_net.params[param_name][0].data[k] = new_net.params[param_name][0].data[k] / std[k]
                                 new_net.params[param_name][1].data[k] = (new_net.params[param_name][1].data[k] - mean[k]) / std[k]
