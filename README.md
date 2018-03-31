@@ -1,4 +1,4 @@
-## Caffe Computation Graph Optimization.
+## Caffe Computation Graph Optimization. (BETA)
 ### Intro :
 **To be clear :** If you are willing to know something about computation graph optimization, [NNVM](http://nnvm.tvmlang.org/) or [XLA](https://www.tensorflow.org/performance/xla/) should be a good start. Here, we just focus on how to squeeze the redundant operations out of topological order computation graph, which is prototxt in Caffe. **Just Tricks, No Theory.**
 
