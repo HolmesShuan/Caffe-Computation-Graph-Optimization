@@ -1,6 +1,6 @@
 ## Caffe Computation Graph Optimization.
 ### Intro :
-**To be clear :** If you are willing to know something about computation graph optimization, [NNVM](http://nnvm.tvmlang.org/) or [XLA](https://www.tensorflow.org/performance/xla/) should be a good start. Here, we just focus on how to squeeze the redundant operations out of topological order computation graph, which is prototxt in Caffe. **Just Tricks, No Theory.**
+If you are willing to know something about computation graph optimization, [NNVM](http://nnvm.tvmlang.org/) or [XLA](https://www.tensorflow.org/performance/xla/) should be a good start. In this case, we focus on how to squeeze the redundant operations out of topological order computation graph, which is `.prototxt` in Caffe. **Just Tricks, No Theory.**
 
 ### How to optimize Caffe computation graph ?
 - Operation Fusion **`*`**:
@@ -17,7 +17,7 @@
   - Dropout
 
 **`*`**: We won't discuss layer reconstruction, such as conv-bn-relu layer. In this repository, one may accelerate models without writing a single line of code.   
-**`**`**: First convolution layer must hold **`pad==0`**, or the fusion of mean value subtraction may lead to performance loss. But scale factor fusion, is free to be utlized without those constraints. Taking 2-D input matrix as an example, 
+**`**`**: First convolution layer must hold **`pad==0`**, or the fusion of mean value subtraction may lead to performance loss. But scale factor is free to be merged in first convolution layer. Take 2-D input matrix as an example, 
 ```matlab
 % Matlab 
 >> mean = 122;
@@ -48,7 +48,7 @@ Fusion | [view](http://ethereon.github.io/netscope/#/gist/409198ed27b1f26595f329
 *GPU : K80 + CUDA8.0 + cuDNN*   
 
 **What is the benefit of in-place optimization ?**   
-In fact, it is a problem inherent in Caffe. As annotation said:   
+In fact, there is an inherent problem in Caffe. As annotation said:   
 > In-place computation; need to store bottom data before overwriting it. Note that this is only necessary for Backward; we could skip this if not doing Backward, but Caffe currently provides no way of knowing whether we'll need to do Backward at the time of the Forward call.
 
 There are some redundant backup memorys at inference time. To further reduce the memory footprint, we need to define a novel memory allocation mechanism, which will be discussed in the future.   
@@ -62,7 +62,7 @@ Naive | 6.981 | 13.769 | 14.550
 OPT   | 5.347 | 8.865 | 7.167
 Acceleration | **1.31x** | **1.55x** | **2.03x**
 
-*mean time of 1K iterations with batchsize=1*
+*average inference time of 1K iterations with batchsize=1*
 ### How to use ?
 ```shell
 pip install configparser --user
