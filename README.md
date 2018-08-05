@@ -65,10 +65,12 @@ Acceleration | **1.31x** | **1.55x** | **2.03x**
 *average inference time of 1K iterations with batchsize=1*
 ### How to use ?
 ```shell
+sudo apt-get install cython
 pip install configparser --user
 pip install numpy --user
 pip install protobuf --user
 pip install scikit-image --user
+
 # install Caffe
 cd /your/caffe/path
 make pycaffe
