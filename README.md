@@ -67,6 +67,7 @@ Acceleration | **1.31x** | **1.55x** | **2.03x**
 ```shell
 pip install configparser --user
 pip install numpy --user
+pip install protobuf --user
 # install Caffe
 cd /your/caffe/path
 make pycaffe
