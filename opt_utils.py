@@ -340,3 +340,33 @@ def DrpOut_OPT_Create_Prototxt(original_prototxt_path, original_model_path, opti
     print bcolors.OKGREEN + "DROPOUT OPT : Model at " + original_model_path + "." + bcolors.ENDC
     print bcolors.OKGREEN + "DROPOUT OPT : Prototxt at " + optimized_prototxt_path + "." + bcolors.ENDC
 
+def ReLU_OPT_Create_Prototxt(original_prototxt_path, original_model_path, optimized_prototxt_path):
+    net_param = caffe_pb2.NetParameter()
+    new_net_param = caffe_pb2.NetParameter()
+    with open(original_prototxt_path, 'rt') as f:
+        Parse(f.read(), net_param)
+    for layer_idx in range(0, len(net_param.layer)):
+        layer = net_param.layer[layer_idx]
+        pre_layer = net_param.layer[layer_idx-1]
+        if layer.type == 'ReLU' and \
+            (pre_layer.type == 'Convolution' or pre_layer.type == 'ConvolutionDepthwise' or pre_layer.type == 'DepthwiseConvolution' or \
+                pre_layer.type == 'InnerProduct' or pre_layer.type == 'Eltwise'):
+            if pre_layer.type == 'Convolution' or pre_layer.type == 'ConvolutionDepthwise' or pre_layer.type == 'DepthwiseConvolution':
+                new_net_param.layer[-1].type = 'ConvolutionReLU'
+            elif pre_layer.type == 'Eltwise':
+                new_net_param.layer[-1].type = 'EltwiseReLU'
+            else:
+                new_net_param.layer[-1].type = 'InnerProductReLU'
+
+            if layer.top[0] == layer.bottom[0]:
+                continue
+            else:
+                new_net_param.layer[-1].top[0] = layer.top[0]
+        else:
+            new_net_param.layer.extend([layer])
+    new_net_param.name = net_param.name
+    with open(optimized_prototxt_path, 'wt') as f:
+        f.write(MessageToString(new_net_param))
+    print "ReLU OPT : Create Optimized Prototxt Done."
+    print bcolors.OKGREEN + "ReLU OPT : Model at " + original_model_path + "." + bcolors.ENDC
+    print bcolors.OKGREEN + "ReLU OPT : Prototxt at " + optimized_prototxt_path + "." + bcolors.ENDC
