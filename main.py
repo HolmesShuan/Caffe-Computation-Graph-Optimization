@@ -48,7 +48,7 @@ memory_opt = config.getboolean('DEFAULT', 'merge_inplace_memory')
 dropout_opt = config.getboolean('DEFAULT', 'merge_dropout')
 
 # ELIMINATE RELU
-relu_opt = config.getboolean('DEFAULT', 'merge_relu')
+relu_opt = False # config.getboolean('DEFAULT', 'merge_relu')
 
 # MAIN FUNCTION
 if memory_opt:
