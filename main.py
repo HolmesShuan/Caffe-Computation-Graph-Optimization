@@ -47,6 +47,9 @@ memory_opt = config.getboolean('DEFAULT', 'merge_inplace_memory')
 # ELIMINATE DROPOUT
 dropout_opt = config.getboolean('DEFAULT', 'merge_dropout')
 
+# ELIMINATE RELU
+relu_opt = config.getboolean('DEFAULT', 'merge_relu')
+
 # MAIN FUNCTION
 if memory_opt:
     print "MEMORY In-PLACE OPT : OPEN. IN-PLACE operations reuse the same blob."
@@ -86,5 +89,13 @@ else:
 if dropout_opt:
     print "DROPOUT OPT : OPEN. ELIMINATE DROPOUT."
     DrpOut_OPT_Create_Prototxt(original_prototxt_path, original_model_path, optimized_prototxt_path)
+    original_prototxt_path = optimized_prototxt_path
+    original_model_path = optimized_model_path
 else:
     print "DROPOUT OPT : CLOSED."  
+
+if relu_opt:
+    print "RELU OPT : OPEN. ELIMINATE RELU."
+    ReLU_OPT_Create_Prototxt(original_prototxt_path, original_model_path, optimized_prototxt_path)
+else:
+    print "RELU OPT : CLOSED." 
