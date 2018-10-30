@@ -96,8 +96,8 @@ merge_bn_scale = yes
 # yes / no
 
 # MERGE INPUT PREPROCESS
-merge_input_scale = yes
-merge_input_mean = yes
+merge_input_scale = no
+merge_input_mean = no
 # yes / no
 # using mean() to calc mean vector [R G B] 
 mean_proto_path = ./data/mean.npy 
