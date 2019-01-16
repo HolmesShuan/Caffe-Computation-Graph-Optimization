@@ -124,3 +124,6 @@ merge_inplace_memory = yes
 # inplace operation memory reuse
 
 ```
+
+#### ONNX Graph Optimization :
+[AMDMIGraphX](https://github.com/ROCmSoftwarePlatform/AMDMIGraphX)
