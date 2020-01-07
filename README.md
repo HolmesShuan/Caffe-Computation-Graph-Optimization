@@ -5,11 +5,11 @@ If you are willing to know something about computation graph optimization, [NNVM
 ### How to optimize Caffe computation graph ?
 - Operation Fusion **`*`**:
   - conv/fc + bn + scale => conv/fc   
-  ```a(((Wx+c)-mu)/std)+b = [aW/std]x+[a(c-mu)/std+b] = W'x+c'```
+  ![equation](http://latex.codecogs.com/gif.latex?k\frac{(Wx+bias)-\mu}{\sqrt{\sigma^2+\epsilon}}+b=\frac{kW}{\sqrt{\sigma^2+\epsilon}}x+(\frac{k(bias-\mu)}{\sqrt{\sigma^2+\epsilon}}+b)=W'x+b')
   - conv/fc + bn => conv/fc   
-  ```((Wx+c)-mu)/std = [W/std]x+[(c-mu)/std] = W'x+c'```
+  ![equation](http://latex.codecogs.com/gif.latex?\frac{(Wx+bias)-\mu}{\sqrt{\sigma^2+\epsilon}}=\frac{W}{\sqrt{\sigma^2+\epsilon}}x+\frac{bias-\mu}{\sqrt{\sigma^2+\epsilon}}=W'x+b')
   - data + conv/fc => conv/fc **`**`**   
-  ```W(k(x-mean))+c = [kW]x+[-kW*mean+c] = W'x+c'```
+  ![equation](http://latex.codecogs.com/gif.latex?W(scale(x-mean))+bias=(W{\cdot}scale)x+(-scale{\cdot}W*mean+bias))
 - In-place Computation:
   - Activation : ReLU ; TanH ; SoftMax ; PReLU
   - Affine : Batch-Normalization ; Scale
